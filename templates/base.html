@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>CRM Mockup - AnyDesk POC</title>
+    <style>
+      body { font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; padding: 24px; background: #f7f8fb; }
+      .card { background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); padding: 18px; margin-bottom: 18px; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { text-align: left; padding: 8px; border-bottom: 1px solid #eee; }
+      .btn { padding: 6px 10px; border-radius: 6px; border: none; cursor: pointer; }
+      .btn-primary { background: #2b6cb0; color: white; }
+      .btn-danger { background: #e53e3e; color: white; }
+      .muted { color: #666; font-size: 0.9rem; }
+      form.inline { display: inline; }
+      .flash { padding: 8px; margin-bottom: 12px; border-radius: 6px; }
+      .flash-success { background: #e6fffa; color: #2c7a7b; }
+      .flash-error { background: #fff5f5; color: #9b2c2c; }
+      .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px; }
+    </style>
+  </head>
+  <body>
+    <div class="topbar">
+      <h2>CRM Mockup · AnyDesk POC</h2>
+      <div class="muted">Mode: {{ mode }}</div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash {{ 'flash-success' if cat=='success' else 'flash-error' }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+
+    <footer class="muted" style="margin-top: 36px;">
+      AnyDesk paths used in this demo follow the provided documentation for endpoints & auth.
+      Replace base URL if you run Enterprise (hostname:8081).
+    </footer>
+  </body>
+</html>

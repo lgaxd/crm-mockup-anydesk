@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+    <h3>Detalhes da Sessão</h3>
+    <p><strong>Session ID:</strong> {{ session.sid }}</p>
+    <p><strong>De:</strong> {{ session.from.alias }} ({{ session.from.cid }})</p>
+    <p><strong>Para:</strong> {{ session.to.alias }} ({{ session.to.cid }})</p>
+    <p><strong>Status:</strong> {% if session.active %}🟢 Ativa{% else %}🔴 Finalizada{% endif %}</p>
+    <p><strong>Duração:</strong> {{ session.duration }} segundos</p>
+    <p><strong>Comentário:</strong> {{ session.comment or 'Sem comentário' }}</p>
+
+    {% if session.active %}
+    <form method="post" action="{{ url_for('close_session', sid=session.sid) }}">
+        <button class="btn btn-danger" type="submit">Encerrar Sessão</button>
+    </form>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('update_comment', sid=session.sid) }}" style="margin-top:10px;">
+        <input type="text" name="comment" placeholder="Novo comentário" required />
+        <button class="btn btn-primary" type="submit">Atualizar comentário</button>
+    </form>
+</div>
+{% endblock %}

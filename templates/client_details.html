@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h3>Usuários conectados</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Client ID</th>
+        <th>Alias</th>
+        <th>Versão</th>
+        <th>Status</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for client in clients %}
+      <tr>
+        <td>{{ client.cid }}</td>
+        <td>{{ client.alias or '-' }}</td>
+        <td>{{ client.client_version }}</td>
+        <td>
+          {% if client.online %}
+            🟢 Online
+          {% else %}
+            🔴 Offline
+          {% endif %}
+        </td>
+        <td>
+          <form class="inline" method="post" action="{{ url_for('change_alias', cid=client.cid) }}">
+            <input type="text" name="alias" placeholder="Novo alias" required />
+            <button class="btn btn-primary" type="submit">Alterar</button>
+          </form>
+          <form class="inline" method="post" action="{{ url_for('remove_alias', cid=client.cid) }}">
+            <button class="btn btn-danger" type="submit">Remover</button>
+          </form>
+          <a class="btn btn-secondary" href="{{ url_for('client_details', cid=client.cid) }}">Detalhes</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
