@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Lista de Sessões</h2>
+
+  {% if sessions and sessions|length > 0 %}
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Origem</th>
+          <th>Destino</th>
+          <th>Status</th>
+          <th>Início</th>
+          <th>Fim</th>
+          <th>Duração</th>
+          <th>Comentário</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for session in sessions %}
+          <tr>
+            <td>{{ session.sid }}</td>
+            <td>{{ session.from.alias if session.from.alias else 'N/A' }}</td>
+            <td>{{ session.to.alias if session.to.alias else 'N/A' }}</td>
+            <td>
+              {% if session.active %}
+                <span style="color:green; font-weight:bold;">Ativa</span>
+              {% else %}
+                <span style="color:red;">Finalizada</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if session['start-time'] %}
+                {{ session['start-time'] | datetimeformat }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if session['end-time'] %}
+                {{ session['end-time'] | datetimeformat }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>
+              {% if session.duration %}
+                {{ session.duration }}s
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ session.comment if session.comment else '—' }}</td>
+            <td>
+              <!-- Detalhes -->
+              <form action="{{ url_for('sessions.session_details', sid=session.sid) }}" method="GET" class="inline">
+                <button class="btn btn-primary" type="submit">Detalhes</button>
+              </form>
+
+              <!-- Alterar Comentário -->
+              <form action="{{ url_for('sessions.change_comment', sid=session.sid) }}" method="POST" class="inline">
+                <input type="text" name="comment" placeholder="Novo comentário" required>
+                <button class="btn btn-primary" type="submit">Alterar</button>
+              </form>
+
+              <!-- Fechar Sessão -->
+              {% if session.active %}
+                <form action="{{ url_for('sessions.close_session', sid=session.sid) }}" method="POST" class="inline">
+                  <button class="btn btn-danger" type="submit">Fechar</button>
+                </form>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nenhuma sessão encontrada.</p>
+  {% endif %}
+</div>
+{% endblock %}
