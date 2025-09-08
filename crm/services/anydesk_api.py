@@ -3,6 +3,21 @@ import hmac
 import hashlib
 import base64
 import requests
+import json
+import os
+
+MOCK_DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "mock_data.json")
+
+def load_mock_data():
+    """Carrega os dados do arquivo JSON."""
+    with open(MOCK_DATA_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_mock_data(data):
+    """Salva alterações no arquivo JSON."""
+    with open(MOCK_DATA_PATH, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
 
 class AnyDeskAPI:
     def __init__(self):
@@ -23,31 +38,28 @@ class AnyDeskAPI:
     # ---------- Clientes ----------
     def get_clients(self):
         if self.mode == "Mock":
-            return [
-                {"cid": "123-456-789", "alias": "Lucas-PC", "client_version": "7.1.10", "online": True},
-                {"cid": "987-654-321", "alias": "FIAP-Lab", "client_version": "7.1.10", "online": False},
-            ]
+            return load_mock_data()["clients"]
         url = f"{self.base_url}/clients"
         headers = {"Authorization": self._generate_auth("GET", "/clients")}
         return requests.get(url, headers=headers).json().get("list", [])
 
     def get_client_details(self, cid):
         if self.mode == "Mock":
-            return {
-                "cid": cid,
-                "alias": "Lucas-PC",
-                "client_version": "7.1.10",
-                "online": True,
-                "online_time": 3600,
-                "last_sessions": []
-            }
+                data = load_mock_data()
+                return next((c for c in data["clients"] if c["cid"] == cid), None)
         url = f"{self.base_url}/clients/{cid}"
         headers = {"Authorization": self._generate_auth("GET", f"/clients/{cid}")}
         return requests.get(url, headers=headers).json()
 
     def update_client_alias(self, cid, alias):
         if self.mode == "Mock":
-            return True
+                data = load_mock_data()
+                for client in data["clients"]:
+                    if client["cid"] == cid:
+                        client["alias"] = alias
+                        save_mock_data(data)
+                        return client
+                return None
         url = f"{self.base_url}/clients/{cid}"
         headers = {
             "Authorization": self._generate_auth("PATCH", f"/clients/{cid}", f'{{"alias": "{alias}"}}'),
@@ -61,31 +73,29 @@ class AnyDeskAPI:
     # ---------- Sessões ----------
     def get_sessions(self):
         if self.mode == "Mock":
-            return [
-                {"sid": "S123", "from": {"alias": "Lucas-PC"}, "to": {"alias": "Servidor"}, "duration": 120, "active": True, "comment": "Sessão de teste"},
-                {"sid": "S456", "from": {"alias": "Notebook"}, "to": {"alias": "Lucas-PC"}, "duration": 200, "active": False, "comment": None},
-            ]
+            return load_mock_data()["sessions"]
         url = f"{self.base_url}/sessions"
         headers = {"Authorization": self._generate_auth("GET", "/sessions")}
         return requests.get(url, headers=headers).json().get("list", [])
 
     def get_session_details(self, sid):
         if self.mode == "Mock":
-            return {
-                "sid": sid,
-                "from": {"alias": "Lucas-PC"},
-                "to": {"alias": "Servidor"},
-                "active": True,
-                "duration": 300,
-                "comment": "Sessão ativa para manutenção"
-            }
+            data = load_mock_data()
+            return next((s for s in data["sessions"] if s["sid"] == sid), None)
         url = f"{self.base_url}/sessions/{sid}"
         headers = {"Authorization": self._generate_auth("GET", f"/sessions/{sid}")}
         return requests.get(url, headers=headers).json()
 
     def close_session(self, sid):
         if self.mode == "Mock":
-            return True
+            data = load_mock_data()
+            for session in data["sessions"]:
+                if session["sid"] == sid:
+                    session["active"] = False
+                    session["end_time"] = int(__import__("time").time())
+                    save_mock_data(data)
+                    return session
+            return None
         url = f"{self.base_url}/sessions/{sid}/action"
         headers = {
             "Authorization": self._generate_auth("POST", f"/sessions/{sid}/action", '{"action":"close"}'),
@@ -95,7 +105,13 @@ class AnyDeskAPI:
 
     def update_session_comment(self, sid, comment):
         if self.mode == "Mock":
-            return True
+            data = load_mock_data()
+            for session in data["sessions"]:
+                if session["sid"] == sid:
+                    session["comment"] = comment
+                    save_mock_data(data)
+                    return session
+            return None
         url = f"{self.base_url}/sessions/{sid}"
         headers = {
             "Authorization": self._generate_auth("PATCH", f"/sessions/{sid}", f'{{"comment": "{comment}"}}'),

@@ -1,0 +1,63 @@
+{
+  "clients": [
+    {
+      "cid": 126685,
+      "alias": "pc01@empresa",
+      "client_version": "2.1.0",
+      "online": true,
+      "online_time": 251350
+    },
+    {
+      "cid": 126686,
+      "alias": "pc02@empresa",
+      "client_version": "2.3.0",
+      "online": false,
+      "online_time": 0
+    }
+  ],
+  "sessions": [
+    {
+      "sid": 1234236543211407417468,
+      "from": {
+        "cid": 126685,
+        "alias": "pc01@empresa"
+      },
+      "to": {
+        "cid": 126686,
+        "alias": "pc02@empresa"
+      },
+      "active": false,
+      "start_time": 1693228800,
+      "end_time": 1693232400,
+      "duration": 3600,
+      "comment": "Suporte remoto para atualização."
+    },
+    {
+      "sid": 1234236543211407417469,
+      "from": {
+        "cid": 126686,
+        "alias": "pc02@company"
+      },
+      "to": {
+        "cid": 126685,
+        "alias": "pc01@company"
+      },
+      "active": true,
+      "start_time": 1693250000,
+      "end_time": null,
+      "duration": 1200,
+      "comment": null
+    }
+  ],
+  "sysinfo": {
+    "name": "AnyDesk REST",
+    "api_ver": "1.0",
+    "license": {
+      "license_id": "",
+      "license_key": "",
+      "api_password": "",
+      "max_clients": -1,
+      "max_sessions": 10
+    }
+  }
+}

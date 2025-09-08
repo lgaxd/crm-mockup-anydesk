@@ -14,6 +14,6 @@ def create_app():
     app.register_blueprint(sessions_bp, url_prefix="/sessions")
 
     # Inicializar integração com API AnyDesk
-    app.anodesk_api = AnyDeskAPI()
+    app.anydesk_api = AnyDeskAPI()
 
     return app
