@@ -8,12 +8,12 @@ anydesk_api = AnyDeskAPI()
 @clients_bp.route("/", methods=["GET"])
 def list_clients():
     clients = anydesk_api.get_clients()  # Retorna lista mock ou real
-    return render_template("users.html", clients=clients)
+    return render_template("users.html", clients=clients, mode=anydesk_api.mode)
 
 @clients_bp.route("/<cid>", methods=["GET"])
 def client_details(cid):
     client = anydesk_api.get_client_details(cid)
-    return render_template("client_details.html", client=client)
+    return render_template("client_details.html", client=client, mode=anydesk_api.mode)
 
 @clients_bp.route("/<cid>/alias", methods=["POST"])
 def change_alias(cid):
@@ -22,7 +22,7 @@ def change_alias(cid):
         flash("Alias atualizado com sucesso!", "success")
     else:
         flash("Erro ao atualizar alias!", "error")
-    return redirect(url_for("clients.client_details", cid=cid))
+    return redirect(url_for("clients.list_clients", cid=cid, _mode=anydesk_api.mode))
 
 @clients_bp.route("/<cid>/alias/remove", methods=["POST"])
 def remove_alias(cid):
@@ -30,4 +30,4 @@ def remove_alias(cid):
         flash("Alias removido com sucesso!", "success")
     else:
         flash("Erro ao remover alias!", "error")
-    return redirect(url_for("clients.client_details", cid=cid))
+    return redirect(url_for("clients.client_details", cid=cid, _mode=anydesk_api.mode))

@@ -13,7 +13,6 @@ def load_mock_data():
     with open(MOCK_DATA_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
 def save_mock_data(data):
     """Salva alterações no arquivo JSON."""
     with open(MOCK_DATA_PATH, "w", encoding="utf-8") as f:
@@ -24,7 +23,10 @@ class AnyDeskAPI:
         self.base_url = "https://v1.api.anydesk.com:8081"
         self.license_id = None  # Coloque sua licença real se for usar modo real
         self.api_password = None
-        self.mode = "Mock" if not self.license_id or not self.api_password else "Real"
+        if not self.license_id or not self.api_password:
+            self.mode = "Mock"
+        else:
+            self.mode = "Real"
 
     def _generate_auth(self, method, resource, body=""):
         timestamp = str(int(time.time()))
@@ -45,8 +47,8 @@ class AnyDeskAPI:
 
     def get_client_details(self, cid):
         if self.mode == "Mock":
-                data = load_mock_data()
-                return next((c for c in data["clients"] if c["cid"] == cid), None)
+            data = load_mock_data()
+            return next((c for c in data["clients"] if c["cid"] == cid), None)
         url = f"{self.base_url}/clients/{cid}"
         headers = {"Authorization": self._generate_auth("GET", f"/clients/{cid}")}
         return requests.get(url, headers=headers).json()
@@ -59,6 +61,7 @@ class AnyDeskAPI:
                         client["alias"] = alias
                         save_mock_data(data)
                         return client
+                # Return None if the session is not found
                 return None
         url = f"{self.base_url}/clients/{cid}"
         headers = {
@@ -108,8 +111,9 @@ class AnyDeskAPI:
             data = load_mock_data()
             for session in data["sessions"]:
                 if session["sid"] == sid:
-                    session["comment"] = comment
-                    save_mock_data(data)
+                    if session.get("comment") != comment:
+                        session["comment"] = comment
+                        save_mock_data(data)
                     return session
             return None
         url = f"{self.base_url}/sessions/{sid}"
